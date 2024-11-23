@@ -1,21 +1,22 @@
 #include "parser.hpp"
 
-Parser::Parser(){
+Parser::Parser(std::vector<std::string>* vecForTokens){
     row = 1;
     col = 0;
     currentChar = '\0';
-    currentString = "";
     fileName = "";
+    tokensVec = vecForTokens;
 }
 
 Parser::~Parser(){
     currentChar = '\0';
-    currentString = "";
+    tokensVec = nullptr;
 }
 
 bool Parser::parse(std::string path){
     fileName = path;
     // check if file exist
+    std::string token = "";
 
     file.open(path);
     if(!file.is_open()){
@@ -23,8 +24,12 @@ bool Parser::parse(std::string path){
         return false;
     }
     while(1){
-        file >> currentChar;
+        // file >> currentChar;
+        getNextChar();
         if(file.eof()){
+            tokensVec->push_back(token);
+            std::cout << token << '\n';
+            token = "";
             break;
         }
         // ifstream don`t give me \n symbols
@@ -35,8 +40,28 @@ bool Parser::parse(std::string path){
         else{
             ++col;
         }
-        std::cout << "now currentChar is " << currentChar << '\n';
+        if(token == "("){
+            tokensVec->push_back(token);
+            std::cout << token << '\n';
+            token = "";
+        }
+        if(token == "{"){
+            tokensVec->push_back(token);
+            std::cout << token << '\n';
+            token = "";
+        }
 
+        if(currentChar == ' ' || currentChar == '\n' || currentChar == '\t' || currentChar == ';' || currentChar == '(' || currentChar == ')' || currentChar == '{' || currentChar == '}'){
+            if(token != ""){
+                tokensVec->push_back(token);
+                std::cout << token << '\n';
+                token = "";
+            }
+            while(currentChar == ' ' || currentChar == '\n' || currentChar == '\t'){
+                getNextChar();
+            }
+        }
+        token += currentChar;
     }
     file.close();
     return true;
@@ -45,4 +70,8 @@ bool Parser::parse(std::string path){
 void Parser::throwError(std::string error){
     std::cout << fileName << ':' << row << ':' << col << " - " << error << '\n';
     exit(1);
+}
+
+void Parser::getNextChar(){
+    currentChar = file.get();
 }

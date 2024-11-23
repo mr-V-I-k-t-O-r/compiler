@@ -1,4 +1,5 @@
 #include <iostream>
+#include <vector>
 
 #include "lexer.hpp"
 #include "parser.hpp"
@@ -8,8 +9,8 @@ int main(int argc, char* argv[]){
         std::cout << "укажите файл\n";
         return 0;
     }
-    Parser pars;
+    std::vector<std::string> tokensVec;
+    Parser pars(&tokensVec);
     pars.parse(argv[1]);
-    std::cout << "end of main\n";
     return 0;
 }
