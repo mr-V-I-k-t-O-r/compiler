@@ -14,7 +14,7 @@ private:
     void getNextChar();
 
 public:
-    Parser(std::vector<std::string>* );
+    Parser(std::vector<std::string>* vecForTokens);
     ~Parser();
 
     bool parse(std::string path);

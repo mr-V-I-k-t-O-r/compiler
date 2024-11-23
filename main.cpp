@@ -12,5 +12,7 @@ int main(int argc, char* argv[]){
     std::vector<std::string> tokensVec;
     Parser pars(&tokensVec);
     pars.parse(argv[1]);
+    Lexer lex(&tokensVec);
+    lex.analyze();
     return 0;
 }

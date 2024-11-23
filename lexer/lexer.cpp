@@ -1,7 +1,84 @@
 #include "lexer.hpp"
 
-Lexer::Lexer(){
+Lexer::Lexer(std::vector<std::string>* vecForTokens){
+	tokensVec = vecForTokens;
 }
 
 Lexer::~Lexer(){
+}
+
+void Lexer::analyze(){
+	Token token;
+	for(auto i: *tokensVec){
+		token.value = i;
+		if(i == "for"){
+			token.type = TokenTypes::FOR;
+			std::cout << token.value << "\tFOR\n";
+		}
+		else if (i == "("){
+			token.type = TokenTypes::LPAR;
+			std::cout << token.value << "\tLPAR\n";
+		}
+		else if (i == ")"){
+			token.type = TokenTypes::RPAR;
+			std::cout << token.value << "\tRPAR\n";
+		}
+		else if (i == "{"){
+			token.type = TokenTypes::LBRA;
+			std::cout << token.value << "\tLBRA\n";
+		}
+		else if (i == "}"){
+			token.type = TokenTypes::RBRA;
+			std::cout << token.value << "\tRBRA\n";
+		}
+		else if (i == ";"){
+			token.type = TokenTypes::SEMICOL;
+			std::cout << token.value << "\tSEMICOL\n";
+		}
+		else if (i == "<"){
+			token.type = TokenTypes::LESS;
+			std::cout << token.value << "\tLESS\n";
+		}
+		else if (i == ">"){
+			token.type = TokenTypes::MORE;
+			std::cout << token.value << "\tMORE\n";
+		}
+		else if (i == "!"){
+			token.type = TokenTypes::NOT;
+			std::cout << token.value << "\tNOT\n";
+		}
+		else if (i == "=="){
+			token.type = TokenTypes::EQ;
+			std::cout << token.value << "\tEQ\n";
+		}
+		else if (i == "!="){
+			token.type = TokenTypes::NEQ;
+			std::cout << token.value << "\tNEQ\n";
+		}
+		else if (i == "="){
+			token.type = TokenTypes::ASSIG;
+			std::cout << token.value << "\tASSIG\n";
+		}
+		else if (i == "+"){
+			token.type = TokenTypes::PLUS;
+			std::cout << token.value << "\tPLUS\n";
+		}
+		else if (i == "-"){
+			token.type = TokenTypes::MIN;
+			std::cout << token.value << "\tMIN\n";
+		}
+		else if (i == "*"){
+			token.type = TokenTypes::MUL;
+			std::cout << token.value << "\tMUL\n";
+		}
+		else if (i == "/"){
+			token.type = TokenTypes::DIV;
+			std::cout << token.value << "\tDIV\n";
+		}
+		//check is_digit
+		else{
+			token.type = TokenTypes::VAR;
+			std::cout << token.value << "\tVAR\n";
+		}
+	}
 }

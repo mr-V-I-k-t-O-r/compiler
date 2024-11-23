@@ -24,15 +24,12 @@ bool Parser::parse(std::string path){
         return false;
     }
     while(1){
-        // file >> currentChar;
         getNextChar();
         if(file.eof()){
             tokensVec->push_back(token);
-            std::cout << token << '\n';
             token = "";
             break;
         }
-        // ifstream don`t give me \n symbols
         if(currentChar == '\n'){
             ++row;
             col = 0;
@@ -42,19 +39,16 @@ bool Parser::parse(std::string path){
         }
         if(token == "("){
             tokensVec->push_back(token);
-            std::cout << token << '\n';
             token = "";
         }
         if(token == "{"){
             tokensVec->push_back(token);
-            std::cout << token << '\n';
             token = "";
         }
 
         if(currentChar == ' ' || currentChar == '\n' || currentChar == '\t' || currentChar == ';' || currentChar == '(' || currentChar == ')' || currentChar == '{' || currentChar == '}'){
             if(token != ""){
                 tokensVec->push_back(token);
-                std::cout << token << '\n';
                 token = "";
             }
             while(currentChar == ' ' || currentChar == '\n' || currentChar == '\t'){
