@@ -75,10 +75,22 @@ void Lexer::analyze(){
 			token.type = TokenTypes::DIV;
 			std::cout << token.value << "\tDIV\n";
 		}
+		else if(checkInt(i)){
+			token.type = TokenTypes::INT;
+			std::cout << token.value << "\tINT\n";
+		}
 		//check is_digit
 		else{
 			token.type = TokenTypes::VAR;
 			std::cout << token.value << "\tVAR\n";
 		}
 	}
+}
+
+bool Lexer::checkInt(std::string integer){
+	std::string::const_iterator it = integer.begin();
+    while (it != integer.end() && std::isdigit(*it)){
+		++it;
+	}
+    return !integer.empty() && it == integer.end();
 }
