@@ -17,10 +17,11 @@ public:
 
 class Lexer{
 private:
-    std::vector<std::string>* tokensVec;
+    std::vector<Token>* tokensVec;
+    const std::vector<std::string>* termsVec;
     bool checkInt(std::string integer);
 public:
-    Lexer(std::vector<std::string>* vecForTokens);
+    Lexer(const std::vector<std::string>* vecForTerms, std::vector<Token>* vecForTokens);
     ~Lexer();
 
     void analyze();

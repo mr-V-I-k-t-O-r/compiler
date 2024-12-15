@@ -1,7 +1,8 @@
 #include "lexer.hpp"
 
-Lexer::Lexer(std::vector<std::string>* vecForTokens){
+Lexer::Lexer(const std::vector<std::string>* vecForTerms, std::vector<Token>* vecForTokens){
 	tokensVec = vecForTokens;
+	termsVec = vecForTerms;
 }
 
 Lexer::~Lexer(){
@@ -9,10 +10,11 @@ Lexer::~Lexer(){
 
 void Lexer::analyze(){
 	Token token;
-	for(auto i: *tokensVec){
+	for(auto i: *termsVec){
 		token.value = i;
 		if(i == "for"){
 			token.type = TokenTypes::FOR;
+			tokensVec->push_back(token);
 			std::cout << token.value << "\tFOR\n";
 		}
 		else if (i == "("){

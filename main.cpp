@@ -9,10 +9,14 @@ int main(int argc, char* argv[]){
         std::cout << "укажите файл\n";
         return 0;
     }
-    std::vector<std::string> tokensVec;
-    Parser pars(&tokensVec);
+    std::vector<std::string> termsVec;
+    Parser pars(&termsVec);
     pars.parse(argv[1]);
-    Lexer lex(&tokensVec);
+    for(auto i : termsVec){
+        std::cout << i << '\n';
+    }
+    std::vector<Token> tokensVec;
+    Lexer lex(&termsVec, &tokensVec);
     lex.analyze();
     return 0;
 }

@@ -37,15 +37,10 @@ bool Parser::parse(std::string path){
         else{
             ++col;
         }
-        if(token == "("){
+        if(token == "(" || token == "{" || token == ")" || token == "}" || token == ";"){
             tokensVec->push_back(token);
             token = "";
         }
-        if(token == "{"){
-            tokensVec->push_back(token);
-            token = "";
-        }
-
         if(currentChar == ' ' || currentChar == '\n' || currentChar == '\t' || currentChar == ';' || currentChar == '(' || currentChar == ')' || currentChar == '{' || currentChar == '}'){
             if(token != ""){
                 tokensVec->push_back(token);
