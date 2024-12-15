@@ -1,6 +1,7 @@
+#ifndef LEXER
+#define LEXER 
 #include <iostream>
 #include <vector>
-#include <map>
 #include <cctype>
 #include <climits>
 
@@ -27,3 +28,4 @@ public:
 
     void analyze();
 };
+#endif
