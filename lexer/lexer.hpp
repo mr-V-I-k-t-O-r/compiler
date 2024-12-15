@@ -19,6 +19,7 @@ class Lexer{
 private:
     std::vector<Token>* tokensVec;
     const std::vector<std::string>* termsVec;
+    
     bool checkInt(std::string integer);
 public:
     Lexer(const std::vector<std::string>* vecForTerms, std::vector<Token>* vecForTokens);

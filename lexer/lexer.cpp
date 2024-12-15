@@ -6,6 +6,8 @@ Lexer::Lexer(const std::vector<std::string>* vecForTerms, std::vector<Token>* ve
 }
 
 Lexer::~Lexer(){
+	tokensVec = nullptr;
+	termsVec = nullptr;
 }
 
 void Lexer::analyze(){
