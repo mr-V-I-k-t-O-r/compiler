@@ -16,7 +16,6 @@ void Lexer::analyze(){
 		token.value = i;
 		if(i == "for"){
 			token.type = TokenTypes::FOR;
-			tokensVec->push_back(token);
 			std::cout << token.value << "\tFOR\n";
 		}
 		else if (i == "("){
@@ -88,6 +87,7 @@ void Lexer::analyze(){
 			token.type = TokenTypes::VAR;
 			std::cout << token.value << "\tVAR\n";
 		}
+		tokensVec->push_back(token);
 	}
 }
 
