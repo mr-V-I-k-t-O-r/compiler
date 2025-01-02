@@ -1,3 +1,6 @@
+#ifndef SYNTAXER
+#define SYNTAXER
+
 #include <iostream>
 #include <vector>
 
@@ -21,68 +24,7 @@ public:
     int value;
     NodeTypes type;
 
-    std::ostream& operator << (std::ostream& os){
-        switch(type){
-            case NodeTypes::CONST:{
-                os << "CONST";
-                break;
-            }
-            case NodeTypes::VAR:{
-                os << "VAR";
-                break;
-            }
-            case NodeTypes::ADD:{
-                os << "ADD";
-                break;
-            }
-            case NodeTypes::SUB:{
-                os << "SUB";
-                break;
-            }
-            case NodeTypes::MUL:{
-                os << "MUL";
-                break;
-            }
-            case NodeTypes::DIV:{
-                os << "DIV";
-                break;
-            }
-            case NodeTypes::MORE:{
-                os << "MORE";
-                break;
-            }
-            case NodeTypes::LESS:{
-                os << "LESS";
-                break;
-            }
-            case NodeTypes::EQ:{
-                os << "EQ";
-                break;
-            }
-            case NodeTypes::NEQ:{
-                os << "NEQ";
-                break;
-            }
-            case NodeTypes::NOT:{
-                os << "NOT";
-                break;
-            }
-            case NodeTypes::FOR:{
-                os << "FOR";
-                break;
-            }
-            case NodeTypes::SET:{
-                os << "SET";
-                break;
-            }
-            case NodeTypes::EMPTY:{
-                os << "EMPTY";
-                break;
-            }
-        }
-        return os;
-    }
-
+    // friend std::ostream& operator << (std::ostream& os, const Node &node);
     Node(NodeTypes type = NodeTypes::EMPTY, int tokenValue = 0, Node* firstChild = nullptr, Node* secondChild = nullptr, Node* thirdChild = nullptr);
     ~Node();
 
@@ -111,3 +53,5 @@ public:
     void analyze();
     void analyze_operation();
 };
+
+#endif

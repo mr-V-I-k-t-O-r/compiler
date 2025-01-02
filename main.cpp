@@ -30,6 +30,7 @@ int main(int argc, char* argv[]){
     std::cout << "-----SYNTAXER-----\n";
     std::vector<Node*> syntaxTree;
     Syntaxer syntax(&tokensVec, &syntaxTree);
+    syntax.analyze();
     std::cout << "-----SYNTAXER-----\n";
 
 

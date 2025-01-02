@@ -1,5 +1,6 @@
 #ifndef LEXER
 #define LEXER 
+
 #include <iostream>
 #include <vector>
 #include <cctype>
