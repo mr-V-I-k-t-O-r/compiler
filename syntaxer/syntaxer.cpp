@@ -143,15 +143,18 @@ Node* Node::getThirdChild(){
     }
 }
 
-Syntaxer::Syntaxer(const std::vector<Token>* vecForTokens, std::vector<Node*>* syntaxTree){
+Syntaxer::Syntaxer(const std::vector<Token>* vecForTokens, std::vector<Node*>* syntaxTree, std::map<std::string, int> *variables){
     tokensVec = vecForTokens;
     tree = syntaxTree;
+    vars = variables;
+    place = 0;
     currentBase = nullptr;
 }
 
 Syntaxer::~Syntaxer(){
     tokensVec = nullptr;
     tree = nullptr;
+    vars = nullptr;
 }
 
 
@@ -162,12 +165,15 @@ void Syntaxer::analyze(){
 }
 
 void Syntaxer::analyze_operation(){
+    std::cout << "start analyze operation\n";
     Node operation;
     Node buffer;
     bool operationUsage = false;
     bool bufferUsage = false;
+    std::cout << (*tokensVec).size() << " \n";
     while((*tokensVec)[place].type != TokenTypes::SEMICOL){
         std::cout << "now work with : " << (*tokensVec)[place].value << '\n';
+        std::cout << "operation is - " << operation << " buffer is " << buffer << '\n';
         if((*tokensVec)[place].type == TokenTypes::FOR){}
         else if((*tokensVec)[place].type == TokenTypes::PLUS){
             if(!bufferUsage){
@@ -258,9 +264,12 @@ void Syntaxer::analyze_operation(){
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::VAR){
+            buffer.type = NodeTypes::VAR;
+            if(vars->find((*tokensVec)[place].value) == vars->end()){
+                (*vars)[(*tokensVec)[place].value] = 0;
+            }
+            buffer.value = (*vars)[(*tokensVec)[place].value];
             if(operationUsage){
-                buffer.type = NodeTypes::VAR;
-                buffer.value = std::stoi((*tokensVec)[place].value);
                 operation.addChild(&buffer);
                 buffer.type = NodeTypes::EMPTY;
                 buffer.value = 0;
@@ -269,8 +278,6 @@ void Syntaxer::analyze_operation(){
             }
             else{
                 bufferUsage = true;
-                buffer.type = NodeTypes::VAR;
-                buffer.value = std::stoi((*tokensVec)[place].value);
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::INT){
@@ -287,7 +294,6 @@ void Syntaxer::analyze_operation(){
             bufferUsage = false;
             operationUsage = false;
         }
-        std::cout << "operation is - " << operation << " buffer is " << buffer << '\n';
         ++place;
     }
 }

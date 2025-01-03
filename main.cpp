@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include <vector>
+#include <map>
 
 #include "parser.hpp"
 #include "lexer.hpp"
@@ -28,8 +28,9 @@ int main(int argc, char* argv[]){
     std::cout << "-----LEXER-----\n";
 
     std::cout << "-----SYNTAXER-----\n";
+    std::map<std::string, int> variables;
     std::vector<Node*> syntaxTree;
-    Syntaxer syntax(&tokensVec, &syntaxTree);
+    Syntaxer syntax(&tokensVec, &syntaxTree, &variables);
     syntax.analyze();
     std::cout << "-----SYNTAXER-----\n";
 

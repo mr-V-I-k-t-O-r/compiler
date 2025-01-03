@@ -3,6 +3,7 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 
 #include "lexer.hpp"
 
@@ -42,12 +43,13 @@ private:
 
     const std::vector<Token>* tokensVec;
     std::vector<Node*>* tree;
+    std::map<std::string, int> *vars;
 
     int place;
 
     Node* currentBase;
 public:
-    Syntaxer(const std::vector<Token>* vecForTokens, std::vector<Node*>* syntaxTree);
+    Syntaxer(const std::vector<Token>* vecForTokens, std::vector<Node*>* syntaxTree, std::map<std::string, int> *variables);
     ~Syntaxer();
 
     void analyze();
