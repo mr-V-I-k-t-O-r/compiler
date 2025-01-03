@@ -173,6 +173,7 @@ void Syntaxer::analyze_operation(){
     std::cout << (*tokensVec).size() << " \n";
     while((*tokensVec)[place].type != TokenTypes::SEMICOL){
         std::cout << "now work with : " << (*tokensVec)[place].value << '\n';
+        std::cout << "operationUsage - " << operationUsage << " bufferUsage - " << bufferUsage << '\n';
         std::cout << "operation is - " << operation << " buffer is " << buffer << '\n';
         if((*tokensVec)[place].type == TokenTypes::FOR){}
         else if((*tokensVec)[place].type == TokenTypes::PLUS){
@@ -263,6 +264,17 @@ void Syntaxer::analyze_operation(){
                 operation.addChild(&buffer);
             }
         }
+        else if((*tokensVec)[place].type == TokenTypes::ASSIG){
+            if(!bufferUsage){
+                // throwError("");
+                exit(1);
+            }
+            else{
+                operationUsage = true;
+                operation.type = NodeTypes::SET;
+                operation.addChild(&buffer);
+            }
+        }        
         else if((*tokensVec)[place].type == TokenTypes::VAR){
             buffer.type = NodeTypes::VAR;
             if(vars->find((*tokensVec)[place].value) == vars->end()){
@@ -295,5 +307,9 @@ void Syntaxer::analyze_operation(){
             operationUsage = false;
         }
         ++place;
+    }
+
+    for(auto i: *vars){
+        std::cout << i.first << ' ' << i.second << '\n';
     }
 }
