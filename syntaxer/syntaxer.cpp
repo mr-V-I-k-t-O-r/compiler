@@ -159,25 +159,19 @@ Syntaxer::~Syntaxer(){
 
 
 void Syntaxer::analyze(){
-    // while(1){
+    while((*tokensVec)[place].type != TokenTypes::END){
         analyze_operation();
-        analyze_operation();
-    // }
+    }
 }
 
 void Syntaxer::analyze_operation(){
-    std::cout << "start analyze operation\n";
     Node *operation;
     Node *buffer;
     bool operationUsage = false;
     bool bufferUsage = false;
-    std::cout << (*tokensVec).size() << " \n";
     while((*tokensVec)[place].type != TokenTypes::SEMICOL){
         operation = new Node;
         buffer = new Node;
-        std::cout << "now work with : " << (*tokensVec)[place].value << '\n';
-        std::cout << "operationUsage - " << operationUsage << " bufferUsage - " << bufferUsage << '\n';
-        std::cout << "operation is - " << operation << " buffer is " << buffer << '\n';
         if((*tokensVec)[place].type == TokenTypes::FOR){}
         else if((*tokensVec)[place].type == TokenTypes::PLUS){
             if(!bufferUsage){

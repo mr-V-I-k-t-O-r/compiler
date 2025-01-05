@@ -89,6 +89,9 @@ void Lexer::analyze(){
 		}
 		tokensVec->push_back(token);
 	}
+	Token end;
+	end.type = TokenTypes::END;
+	tokensVec->push_back(end);
 }
 
 bool Lexer::checkInt(std::string integer){
