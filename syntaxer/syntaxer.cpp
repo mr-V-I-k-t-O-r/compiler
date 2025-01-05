@@ -161,17 +161,20 @@ Syntaxer::~Syntaxer(){
 void Syntaxer::analyze(){
     // while(1){
         analyze_operation();
+        analyze_operation();
     // }
 }
 
 void Syntaxer::analyze_operation(){
     std::cout << "start analyze operation\n";
-    Node operation;
-    Node buffer;
+    Node *operation;
+    Node *buffer;
     bool operationUsage = false;
     bool bufferUsage = false;
     std::cout << (*tokensVec).size() << " \n";
     while((*tokensVec)[place].type != TokenTypes::SEMICOL){
+        operation = new Node;
+        buffer = new Node;
         std::cout << "now work with : " << (*tokensVec)[place].value << '\n';
         std::cout << "operationUsage - " << operationUsage << " bufferUsage - " << bufferUsage << '\n';
         std::cout << "operation is - " << operation << " buffer is " << buffer << '\n';
@@ -183,8 +186,9 @@ void Syntaxer::analyze_operation(){
             }
             else{
                 operationUsage = true;
-                operation.type = NodeTypes::ADD;
-                operation.addChild(&buffer);
+                operation->type = NodeTypes::ADD;
+                operation->addChild(buffer);
+                buffer = nullptr;
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::MIN){
@@ -194,8 +198,9 @@ void Syntaxer::analyze_operation(){
             }
             else{
                 operationUsage = true;
-                operation.type = NodeTypes::SUB;
-                operation.addChild(&buffer);
+                operation->type = NodeTypes::SUB;
+                operation->addChild(buffer);
+                buffer = nullptr;
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::MUL){
@@ -205,8 +210,9 @@ void Syntaxer::analyze_operation(){
             }
             else{
                 operationUsage = true;
-                operation.type = NodeTypes::MUL;
-                operation.addChild(&buffer);
+                operation->type = NodeTypes::MUL;
+                operation->addChild(buffer);
+                buffer = nullptr;
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::DIV){
@@ -216,8 +222,9 @@ void Syntaxer::analyze_operation(){
             }
             else{
                 operationUsage = true;
-                operation.type = NodeTypes::DIV;
-                operation.addChild(&buffer);
+                operation->type = NodeTypes::DIV;
+                operation->addChild(buffer);
+                buffer = nullptr;
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::MORE){
@@ -227,8 +234,9 @@ void Syntaxer::analyze_operation(){
             }
             else{
                 operationUsage = true;
-                operation.type = NodeTypes::MORE;
-                operation.addChild(&buffer);
+                operation->type = NodeTypes::MORE;
+                operation->addChild(buffer);
+                buffer = nullptr;
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::LESS){
@@ -238,8 +246,9 @@ void Syntaxer::analyze_operation(){
             }
             else{
                 operationUsage = true;
-                operation.type = NodeTypes::LESS;
-                operation.addChild(&buffer);
+                operation->type = NodeTypes::LESS;
+                operation->addChild(buffer);
+                buffer = nullptr;
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::EQ){
@@ -249,8 +258,9 @@ void Syntaxer::analyze_operation(){
             }
             else{
                 operationUsage = true;
-                operation.type = NodeTypes::EQ;
-                operation.addChild(&buffer);
+                operation->type = NodeTypes::EQ;
+                operation->addChild(buffer);
+                buffer = nullptr;
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::NEQ){
@@ -260,8 +270,9 @@ void Syntaxer::analyze_operation(){
             }
             else{
                 operationUsage = true;
-                operation.type = NodeTypes::NEQ;
-                operation.addChild(&buffer);
+                operation->type = NodeTypes::NEQ;
+                operation->addChild(buffer);
+                buffer = nullptr;
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::ASSIG){
@@ -271,20 +282,20 @@ void Syntaxer::analyze_operation(){
             }
             else{
                 operationUsage = true;
-                operation.type = NodeTypes::SET;
-                operation.addChild(&buffer);
+                operation->type = NodeTypes::SET;
+                operation->addChild(buffer);
+                buffer = nullptr;
             }
         }        
         else if((*tokensVec)[place].type == TokenTypes::VAR){
-            buffer.type = NodeTypes::VAR;
+            buffer->type = NodeTypes::VAR;
             if(vars->find((*tokensVec)[place].value) == vars->end()){
                 (*vars)[(*tokensVec)[place].value] = 0;
             }
-            buffer.value = (*vars)[(*tokensVec)[place].value];
+            buffer->value = (*vars)[(*tokensVec)[place].value];
             if(operationUsage){
-                operation.addChild(&buffer);
-                buffer.type = NodeTypes::EMPTY;
-                buffer.value = 0;
+                operation->addChild(buffer);
+                buffer = nullptr;
                 bufferUsage = false;
                 operationUsage = false;
             }
@@ -298,16 +309,18 @@ void Syntaxer::analyze_operation(){
                 exit(1);
             }
 
-            buffer.type = NodeTypes::VAR;
-            buffer.value = std::stoi((*tokensVec)[place].value);
-            operation.addChild(&buffer);
-            buffer.type = NodeTypes::EMPTY;
-            buffer.value = 0;
+            buffer->type = NodeTypes::VAR;
+            buffer->value = std::stoi((*tokensVec)[place].value);
+            operation->addChild(buffer);
+            buffer = nullptr;
             bufferUsage = false;
             operationUsage = false;
         }
         ++place;
+        delete buffer;
+        delete operation;
     }
+    ++place;
 
     for(auto i: *vars){
         std::cout << i.first << ' ' << i.second << '\n';
