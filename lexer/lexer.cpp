@@ -1,13 +1,15 @@
 #include "lexer.hpp"
 
-Lexer::Lexer(const std::vector<std::string>* vecForTerms, std::vector<Token>* vecForTokens){
+Lexer::Lexer(const std::vector<std::string>* vecForTerms, std::vector<Token>* vecForTokens, std::map<std::string, int> *variables){
 	tokensVec = vecForTokens;
 	termsVec = vecForTerms;
+	vars = variables;
 }
 
 Lexer::~Lexer(){
 	tokensVec = nullptr;
 	termsVec = nullptr;
+	vars = nullptr;
 }
 
 void Lexer::analyze(){
@@ -89,10 +91,15 @@ void Lexer::analyze(){
 			std::cout << token.value << "\tTYPE\n";
 		}
 		//check is_digit
-		else if(type){
-			token.type = TokenTypes::VAR;
-			type = false;
-			std::cout << token.value << "\tVAR\n";
+		else{
+			if(type){
+				(*vars)[i] = 0;
+			}
+			if(vars->find(i) != vars->end()){
+				token.type = TokenTypes::VAR;
+				type = false;
+				std::cout << token.value << "\tVAR\n";
+			}
 		}
 		tokensVec->push_back(token);
 	}

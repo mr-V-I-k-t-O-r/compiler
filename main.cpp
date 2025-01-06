@@ -23,12 +23,12 @@ int main(int argc, char* argv[]){
 
     std::cout << "-----LEXER-----\n";
     std::vector<Token> tokensVec;
-    Lexer lex(&termsVec, &tokensVec);
+    std::map<std::string, int> variables;
+    Lexer lex(&termsVec, &tokensVec, &variables);
     lex.analyze();
     std::cout << "-----LEXER-----\n";
 
     std::cout << "-----SYNTAXER-----\n";
-    std::map<std::string, int> variables;
     std::vector<Node*> syntaxTree;
     Syntaxer syntax(&tokensVec, &syntaxTree, &variables);
     syntax.analyze();

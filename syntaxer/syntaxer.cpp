@@ -155,6 +155,7 @@ Syntaxer::Syntaxer(const std::vector<Token>* vecForTokens, std::vector<Node*>* s
     vars = variables;
     place = 0;
     currentBase = nullptr;
+    currentEnd = nullptr;
 }
 
 Syntaxer::~Syntaxer(){
@@ -170,6 +171,11 @@ void Syntaxer::analyze(){
             break;
         }
         analyzeOperation();
+    }
+
+
+    for(auto i: *vars){
+        std::cout << i.first << ' ' << i.second << '\n';
     }
 }
 
@@ -299,34 +305,32 @@ void Syntaxer::analyzeOperation(){
                 operation->addChild(buffer);
                 buffer = nullptr;
             }
-        }        
+        }      
         else if((*tokensVec)[place].type == TokenTypes::VAR){
-            buffer->type = NodeTypes::VAR;
-            if(vars->find((*tokensVec)[place].value) == vars->end()){
-                (*vars)[(*tokensVec)[place].value] = 0;
-            }
-            if(operationUsage){
-                operation->addChild(buffer);
-                buffer = nullptr;
-                bufferUsage = false;
-                operationUsage = false;
-            }
-            else{
+            if(!bufferUsage){
+                buffer = new Node;
+                buffer->type = NodeTypes::VAR;
                 bufferUsage = true;
+                if(operationUsage){
+                    operation->addChild(buffer);
+                    buffer = nullptr;
+                    bufferUsage = false;
+                }
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::INT){
-            if(!operationUsage){
-                // throwError("unused constant");
-                exit(1);
+            if(!bufferUsage){
+                buffer = new Node;
+                buffer->type = NodeTypes::CONST;
+                buffer->value = std::stoi((*tokensVec)[place].value);
+                if(operationUsage){
+                    std::cout << operation << '\n';
+                    operation->addChild(buffer);
+                    buffer = nullptr;
+                    bufferUsage = false;
+                    operationUsage = false;
+                }
             }
-
-            buffer->type = NodeTypes::VAR;
-            buffer->value = std::stoi((*tokensVec)[place].value);
-            operation->addChild(buffer);
-            buffer = nullptr;
-            bufferUsage = false;
-            operationUsage = false;
         }
         else if((*tokensVec)[place].type == TokenTypes::TYPE){
         }
@@ -341,11 +345,6 @@ void Syntaxer::analyzeOperation(){
         delete operation;
     }
     ++place;
-
-
-    for(auto i: *vars){
-        std::cout << i.first << ' ' << i.second << '\n';
-    }
 }
 
 void Syntaxer::analyzePars(){
@@ -356,11 +355,20 @@ void Syntaxer::analyzePars(){
 
 void Syntaxer::analyzeBras(){
     while((*tokensVec)[place].type != TokenTypes::RBRA){
-        ++place;
+        analyzeOperation();
     }
 }
 
 void Syntaxer::analyzeFor(){
+    std::cout << "start for\n";
+
+    Node* forNode = new Node;
+    forNode->type = NodeTypes::FOR;
+
+    Node* initial = nullptr;
+    Node* condition = nullptr;
+    Node* change = nullptr;
+
     ++place;
     if((*tokensVec)[place].type != TokenTypes::LPAR){
         exit(1);
@@ -369,15 +377,273 @@ void Syntaxer::analyzeFor(){
     bool cond = false;
     Node *buffer = nullptr;
     Node *operation = nullptr;
+    bool bufferUsage = false;
+    bool operationUsage = false;
     while((*tokensVec)[place].type != TokenTypes::RPAR){
+        std::cout << "while iteration\n";
         if((*tokensVec)[place].type == TokenTypes::SEMICOL){
-            init ? cond = true : init = true;
+            std::cout << ";\n";
+            if(!init){
+                initial = operation;
+                operation = nullptr;
+                operationUsage = false;
+            }
+            else if(!cond){
+                condition = operation;
+                operation = nullptr;
+                operationUsage = false;
+            }
+            if(bufferUsage){
+                currentEnd->addChild(buffer);
+            }
         }
-        if((*tokensVec)[place].type == TokenTypes::VAR){
-            buffer = new Node;
-            buffer->type = NodeTypes::VAR;
-
+        else if((*tokensVec)[place].type == TokenTypes::VAR){
+            if(!bufferUsage){
+                buffer = new Node;
+                buffer->type = NodeTypes::VAR;
+                bufferUsage = true;
+                if(operationUsage){
+                    operation->addChild(buffer);
+                    buffer = nullptr;
+                    bufferUsage = false;
+                }
+            }
         }
+        else if((*tokensVec)[place].type == TokenTypes::INT){
+            if(!operationUsage){
+                // throwError("unused constant");
+                if(init && !cond){
+                    if(std::stoi((*tokensVec)[place].value) == 0){
+                        // 0 iterations
+                    }
+                    else{
+                        // infinity iterations
+                    }
+                }
+            }
+            else{
+                if(!bufferUsage){
+                    buffer = new Node;
+                    buffer->type = NodeTypes::CONST;
+                    buffer->value = std::stoi((*tokensVec)[place].value);
+                    if(operationUsage){
+                        std::cout << operation << '\n';
+                        operation->addChild(buffer);
+                        buffer = nullptr;
+                        bufferUsage = false;
+                        operationUsage = false;
+                    }
+                }
+            }
+        }
+        else if((*tokensVec)[place].type == TokenTypes::ASSIG){
+            if(buffer->type != NodeTypes::VAR){
+                exit(1);
+            }
+            operation = new Node;
+            operation->type = NodeTypes::SET;
+            operationUsage = true;
+            operation->addChild(buffer);
+            if(currentEnd == nullptr){
+                currentEnd = operation;
+            }
+            else{
+                currentEnd->addChild(operation);
+            }
+            bufferUsage = false;
+            buffer = nullptr;
+        }
+        else if((*tokensVec)[place].type == TokenTypes::PLUS){
+            if(!bufferUsage){
+                // throwError("");
+                exit(1);
+            }
+            operation = new Node;
+            operation->type = NodeTypes::ADD;
+            operationUsage = true;
+            operation->addChild(buffer);
+            if(currentEnd == nullptr){
+                currentEnd = operation;
+            }
+            else{
+                currentEnd->addChild(operation);
+            }
+            
+            bufferUsage = false;
+            buffer = nullptr;
+        }
+        else if((*tokensVec)[place].type == TokenTypes::MIN){
+            if(!bufferUsage){
+                // throwError("");
+                exit(1);
+            }
+            operation = new Node;
+            operation->type = NodeTypes::SUB;
+            operationUsage = true;
+            operation->addChild(buffer);
+            if(currentEnd == nullptr){
+                currentEnd = operation;
+            }
+            else{
+                currentEnd->addChild(operation);
+            }
+            
+            bufferUsage = false;
+            buffer = nullptr;
+        }
+        else if((*tokensVec)[place].type == TokenTypes::MUL){
+            if(!bufferUsage){
+                // throwError("");
+                exit(1);
+            }
+            operation = new Node;
+            operation->type = NodeTypes::MUL;
+            operationUsage = true;
+            operation->addChild(buffer);
+            if(currentEnd == nullptr){
+                currentEnd = operation;
+            }
+            else{
+                currentEnd->addChild(operation);
+            }
+            
+            bufferUsage = false;
+            buffer = nullptr;
+        }
+        else if((*tokensVec)[place].type == TokenTypes::DIV){
+            if(!bufferUsage){
+                // throwError("");
+                exit(1);
+            }
+            operation = new Node;
+            operation->type = NodeTypes::DIV;
+            operationUsage = true;
+            operation->addChild(buffer);
+            if(currentEnd == nullptr){
+                currentEnd = operation;
+            }
+            else{
+                currentEnd->addChild(operation);
+            }
+            
+            bufferUsage = false;
+            buffer = nullptr;
+        }
+        else if((*tokensVec)[place].type == TokenTypes::MORE){
+            if(!bufferUsage){
+                // throwError("");
+                exit(1);
+            }
+            operation = new Node;
+            operation->type = NodeTypes::MORE;
+            operationUsage = true;
+            operation->addChild(buffer);
+            if(currentEnd == nullptr){
+                currentEnd = operation;
+            }
+            else{
+                currentEnd->addChild(operation);
+            }
+            
+            bufferUsage = false;
+            buffer = nullptr;
+        }
+        else if((*tokensVec)[place].type == TokenTypes::LESS){
+            if(!bufferUsage){
+                // throwError("");
+                exit(1);
+            }
+            operation = new Node;
+            operation->type = NodeTypes::LESS;
+            operationUsage = true;
+            operation->addChild(buffer);
+            if(currentEnd == nullptr){
+                currentEnd = operation;
+            }
+            else{
+                currentEnd->addChild(operation);
+            }
+            
+            bufferUsage = false;
+            buffer = nullptr;
+        }
+        else if((*tokensVec)[place].type == TokenTypes::EQ){
+            if(!bufferUsage){
+                // throwError("");
+                exit(1);
+            }
+            operation = new Node;
+            operation->type = NodeTypes::EQ;
+            operationUsage = true;
+            operation->addChild(buffer);
+            if(currentEnd == nullptr){
+                currentEnd = operation;
+            }
+            else{
+                currentEnd->addChild(operation);
+            }
+            
+            bufferUsage = false;
+            buffer = nullptr;
+        }
+        else if((*tokensVec)[place].type == TokenTypes::NEQ){
+            if(!bufferUsage){
+                // throwError("");
+                exit(1);
+            }
+            operation = new Node;
+            operation->type = NodeTypes::NEQ;
+            operationUsage = true;
+            operation->addChild(buffer);
+            if(currentEnd == nullptr){
+                currentEnd = operation;
+            }
+            else{
+                currentEnd->addChild(operation);
+            }
+            
+            bufferUsage = false;
+            buffer = nullptr;
+        }
+        else if((*tokensVec)[place].type == TokenTypes::ASSIG){
+            if(!bufferUsage){
+                // throwError("");
+                exit(1);
+            }
+            operation = new Node;
+            operation->type = NodeTypes::SET;
+            operationUsage = true;
+            operation->addChild(buffer);
+            if(currentEnd == nullptr){
+                currentEnd = operation;
+            }
+            else{
+                currentEnd->addChild(operation);
+            }
+            
+            bufferUsage = false;
+            buffer = nullptr;
+        }        
         ++place;
     }
+
+    change = operation;
+    operation = nullptr;
+    operationUsage = false;
+    std::cout << "1 child for for\n";
+    forNode->addChild(initial);
+    std::cout << "2 child for for\n";
+    forNode->addChild(condition);
+    std::cout << "3 child for for\n";
+    forNode->addChild(change);
+    std::cout << "all childs for for\n";
+
+    initial = nullptr;
+    condition = nullptr;
+    change = nullptr;
+
+    // currentBase->addChild(forNode);
+    forNode = nullptr;
+
+    std::cout << "end of for\n";
 }

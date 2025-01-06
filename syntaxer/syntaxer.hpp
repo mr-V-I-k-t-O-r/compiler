@@ -47,7 +47,8 @@ private:
 
     int place;
 
-    Node* currentBase;
+    Node *currentBase;
+    Node *currentEnd;
 public:
     Syntaxer(const std::vector<Token>* vecForTokens, std::vector<Node*>* syntaxTree, std::map<std::string, int> *variables);
     ~Syntaxer();
