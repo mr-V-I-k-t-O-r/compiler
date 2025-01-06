@@ -377,7 +377,6 @@ void Syntaxer::analyzePars(){
     while((*tokensVec)[place].type != TokenTypes::RPAR){
         ++place;
     }
-    ++place;
 }
 
 void Syntaxer::analyzeBras(){
@@ -385,7 +384,6 @@ void Syntaxer::analyzeBras(){
     while((*tokensVec)[place].type != TokenTypes::RBRA){
         ++place;
     }
-    ++place;
 }
 
 void Syntaxer::analyzeFor(){
