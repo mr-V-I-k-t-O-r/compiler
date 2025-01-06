@@ -84,26 +84,21 @@ void Lexer::analyze(){
 			std::cout << token.value << "\tINT\n";
 		}
 		else if (i == "int"){
-			std::cout << "type in lexer\n";
 			token.type = TokenTypes::TYPE;
 			type = true;
 			std::cout << token.value << "\tTYPE\n";
 		}
 		//check is_digit
 		else if(type){
-			std::cout << "var in lexer\n";
 			token.type = TokenTypes::VAR;
 			type = false;
 			std::cout << token.value << "\tVAR\n";
 		}
 		tokensVec->push_back(token);
-		std::cout << "PUSH BACK token\n";
 	}
 	Token end;
 	end.type = TokenTypes::END;
 	tokensVec->push_back(end);
-	std::cout << "PUSH BACK end\n";
-	std::cout << "size of tokens - " << tokensVec->size() << '\n';
 }
 
 bool Lexer::checkInt(std::string integer){
