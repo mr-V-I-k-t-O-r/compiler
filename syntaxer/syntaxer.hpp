@@ -53,7 +53,10 @@ public:
     ~Syntaxer();
 
     void analyze();
-    void analyze_operation();
+    void analyzeOperation();
+    void analyzePars();
+    void analyzeBras();
+    void analyzeFor();
 };
 
 #endif

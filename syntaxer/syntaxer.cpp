@@ -87,12 +87,21 @@ Node::Node(NodeTypes nodeType, int tokenValue, Node* firstChildNode, Node* secon
 }
 
 Node::~Node(){
-    delete firstChild;
-    firstChild = nullptr;
-    delete secondChild;
-    secondChild = nullptr;
-    delete thirdChild;
-    thirdChild = nullptr;
+    // std::cout << "1\n";
+    if(firstChild != nullptr){
+        delete firstChild;
+        firstChild = nullptr;
+    }
+    // std::cout << "2\n";
+    if(firstChild != nullptr){
+        delete secondChild;
+        secondChild = nullptr;
+    }
+    // std::cout << "3\n";
+    if(firstChild != nullptr){
+        delete thirdChild;
+        thirdChild = nullptr;
+    }
 }
 
 void Node::addChild(Node* childNode){
@@ -160,20 +169,40 @@ Syntaxer::~Syntaxer(){
 
 void Syntaxer::analyze(){
     while((*tokensVec)[place].type != TokenTypes::END){
-        analyze_operation();
+        std::cout << "syntaxers tokens size - " << tokensVec->size() << " place - " << place << '\n';
+        if(place >= tokensVec->size()){
+            break;
+        }
+        analyzeOperation();
     }
 }
 
-void Syntaxer::analyze_operation(){
+void Syntaxer::analyzeOperation(){
+    std::cout << "place in operation - " << place << '\n';
     Node *operation;
     Node *buffer;
     bool operationUsage = false;
     bool bufferUsage = false;
-    while((*tokensVec)[place].type != TokenTypes::SEMICOL){
+    while((*tokensVec)[place].type != TokenTypes::SEMICOL && (*tokensVec)[place].type != TokenTypes::END){
+        if((*tokensVec)[place].type == TokenTypes::LPAR){
+            std::cout << "call pars\n";
+            ++place;
+            analyzePars();
+        }
+        else if((*tokensVec)[place].type == TokenTypes::LBRA){
+            std::cout << "call bras\n";
+            ++place;
+            analyzeBras();
+        } 
+        std::cout << "iteration with token\n";
         operation = new Node;
         buffer = new Node;
-        if((*tokensVec)[place].type == TokenTypes::FOR){}
+        if((*tokensVec)[place].type == TokenTypes::FOR){
+            std::cout << "for\n";
+            analyzeFor();
+        }
         else if((*tokensVec)[place].type == TokenTypes::PLUS){
+            std::cout << "plus\n";
             if(!bufferUsage){
                 // throwError("");
                 exit(1);
@@ -186,6 +215,7 @@ void Syntaxer::analyze_operation(){
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::MIN){
+            std::cout << "min\n";
             if(!bufferUsage){
                 // throwError("");
                 exit(1);
@@ -198,6 +228,7 @@ void Syntaxer::analyze_operation(){
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::MUL){
+            std::cout << "mul\n";
             if(!bufferUsage){
                 // throwError("");
                 exit(1);
@@ -210,6 +241,7 @@ void Syntaxer::analyze_operation(){
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::DIV){
+            std::cout << "div\n";
             if(!bufferUsage){
                 // throwError("");
                 exit(1);
@@ -222,6 +254,7 @@ void Syntaxer::analyze_operation(){
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::MORE){
+            std::cout << "more\n";
             if(!bufferUsage){
                 // throwError("");
                 exit(1);
@@ -234,6 +267,7 @@ void Syntaxer::analyze_operation(){
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::LESS){
+            std::cout << "less\n";
             if(!bufferUsage){
                 // throwError("");
                 exit(1);
@@ -246,6 +280,7 @@ void Syntaxer::analyze_operation(){
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::EQ){
+            std::cout << "eq\n";
             if(!bufferUsage){
                 // throwError("");
                 exit(1);
@@ -258,6 +293,7 @@ void Syntaxer::analyze_operation(){
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::NEQ){
+            std::cout << "neq\n";
             if(!bufferUsage){
                 // throwError("");
                 exit(1);
@@ -270,6 +306,7 @@ void Syntaxer::analyze_operation(){
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::ASSIG){
+            std::cout << "assig\n";
             if(!bufferUsage){
                 // throwError("");
                 exit(1);
@@ -282,11 +319,11 @@ void Syntaxer::analyze_operation(){
             }
         }        
         else if((*tokensVec)[place].type == TokenTypes::VAR){
+            std::cout << "var\n";
             buffer->type = NodeTypes::VAR;
             if(vars->find((*tokensVec)[place].value) == vars->end()){
                 (*vars)[(*tokensVec)[place].value] = 0;
             }
-            buffer->value = (*vars)[(*tokensVec)[place].value];
             if(operationUsage){
                 operation->addChild(buffer);
                 buffer = nullptr;
@@ -298,6 +335,7 @@ void Syntaxer::analyze_operation(){
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::INT){
+            std::cout << "int\n";
             if(!operationUsage){
                 // throwError("unused constant");
                 exit(1);
@@ -310,13 +348,65 @@ void Syntaxer::analyze_operation(){
             bufferUsage = false;
             operationUsage = false;
         }
+        else if((*tokensVec)[place].type == TokenTypes::TYPE){
+            std::cout << "type, place - " << place << "\n";
+        }
+        else if((*tokensVec)[place].type == TokenTypes::RBRA){
+            std::cout << "rbra, place - " << place << "\n";
+        }
+        else if((*tokensVec)[place].type == TokenTypes::RPAR){
+            std::cout << "rpar, place - " << place << "\n";
+        }
+        else if((*tokensVec)[place].type == TokenTypes::NOT){
+            std::cout << "not, place - " << place << "\n";
+        }
         ++place;
         delete buffer;
         delete operation;
     }
     ++place;
 
+
     for(auto i: *vars){
         std::cout << i.first << ' ' << i.second << '\n';
     }
+}
+
+void Syntaxer::analyzePars(){
+    std::cout << "pars\n";
+    while((*tokensVec)[place].type != TokenTypes::RPAR){
+        ++place;
+    }
+    ++place;
+}
+
+void Syntaxer::analyzeBras(){
+    std::cout << "bras\n";
+    while((*tokensVec)[place].type != TokenTypes::RBRA){
+        ++place;
+    }
+    ++place;
+}
+
+void Syntaxer::analyzeFor(){
+    ++place;
+    if((*tokensVec)[place].type != TokenTypes::LPAR){
+        exit(1);
+    }
+    bool init = false;
+    bool cond = false;
+    Node *buffer = nullptr;
+    Node *operation = nullptr;
+    while((*tokensVec)[place].type != TokenTypes::RPAR){
+        if((*tokensVec)[place].type == TokenTypes::SEMICOL){
+            init ? cond = true : init = true;
+        }
+        if((*tokensVec)[place].type == TokenTypes::VAR){
+            buffer = new Node;
+            buffer->type = NodeTypes::VAR;
+
+        }
+        ++place;
+    }
+    std::cout << "end of analyze for\n";
 }
