@@ -8,7 +8,7 @@
 #include "lexer.hpp"
 
 enum class NodeTypes{
-    CONST, VAR, ADD, SUB, MUL, DIV, MORE, LESS, EQ, NEQ, NOT, FOR, SET, EMPTY, START
+    CONST, VAR, ADD, SUB, MUL, DIV, MORE, LESS, EQ, NEQ, NOT, FOR, SET, EMPTY, START, OPERATION, BLOCK, BLOCKS, BLOCKF
 };
 
 
@@ -34,7 +34,7 @@ public:
 
     void addChild(Node* childNode);
 
-    void addNext(Node* childNode);
+    void addNext(Node* nextNode);
 
     int getNumChildren();
 
@@ -54,6 +54,8 @@ private:
     std::map<std::string, int> *vars;
 
     int place;
+
+    Node *totalBase;
 
     Node *currentBase;
     Node *currentEnd;
