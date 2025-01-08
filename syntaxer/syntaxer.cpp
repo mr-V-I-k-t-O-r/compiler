@@ -85,9 +85,6 @@ std::ostream& operator<< (std::ostream& os, const Node &node){
 void printNodesInTree(Node *node, int dot){
     std::cout << (*node) << '\t' << dot << '\n';
     switch(node->getNumChildren()){
-        case 4:{
-            printNodesInTree(node->getFourthChild(), dot + 1);
-        }
         case 3:{
             printNodesInTree(node->getThirdChild(), dot + 1);
         }
@@ -115,7 +112,6 @@ Node::Node(NodeTypes nodeType, int tokenValue){
     firstChild = nullptr;
     secondChild = nullptr;
     thirdChild = nullptr;
-    fourthChild = nullptr;
 
     next = nullptr;
 }
@@ -132,10 +128,6 @@ Node::~Node(){
     if(thirdChild != nullptr){
         delete thirdChild;
         thirdChild = nullptr;
-    }
-    if(fourthChild != nullptr){
-        delete fourthChild;
-        fourthChild = nullptr;
     }
 
     if(next != nullptr){
@@ -156,9 +148,6 @@ void Node::addChild(Node* childNode){
     }
     else if(numChildren == 2){
         thirdChild = childNode;
-    }
-    else if(numChildren == 3){
-        fourthChild = childNode;
     }
     else{
         return;
@@ -188,10 +177,6 @@ Node* Node::getSecondChild(){
 
 Node* Node::getThirdChild(){
     return thirdChild;
-}
-
-Node* Node::getFourthChild(){
-    return fourthChild;
 }
 
 Node* Node::getNext(){
@@ -443,8 +428,6 @@ void Syntaxer::analyzeFor(){
     if((*tokensVec)[place].type != TokenTypes::LPAR){
         exit(1);
     }
-    bool init = false;
-    bool cond = false;
     Node *buffer = nullptr;
     Node *operation = nullptr;
     bool bufferUsage = false;
