@@ -93,6 +93,9 @@ void Lexer::analyze(){
 		//check is_digit
 		else{
 			if(type){
+				if(vars->find(i) != vars->end()){
+					exit(1);
+				}
 				(*vars)[i] = 0;
 			}
 			if(vars->find(i) != vars->end()){

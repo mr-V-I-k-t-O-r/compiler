@@ -8,7 +8,7 @@
 #include "lexer.hpp"
 
 enum class NodeTypes{
-    CONST, VAR, ADD, SUB, MUL, DIV, MORE, LESS, EQ, NEQ, NOT, FOR, SET, EMPTY
+    CONST, VAR, ADD, SUB, MUL, DIV, MORE, LESS, EQ, NEQ, NOT, FOR, SET, EMPTY, START
 };
 
 
@@ -17,6 +17,9 @@ private:
     Node* firstChild;
     Node* secondChild;
     Node* thirdChild;
+    Node* fourthChild;
+
+    Node* next;
 
     int numChildren;
 
@@ -31,11 +34,16 @@ public:
 
     void addChild(Node* childNode);
 
+    void addNext(Node* childNode);
+
     int getNumChildren();
 
     Node* getFirstChild();
     Node* getSecondChild();
     Node* getThirdChild();
+    Node* getFourthChild();
+
+    Node* getNext();
 };
 
 class Syntaxer{
