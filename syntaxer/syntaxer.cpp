@@ -75,7 +75,7 @@ std::ostream& operator<< (std::ostream& os, const Node &node){
             break;
         }
         case NodeTypes::OPERATION:{
-            os << "OPERATION\n";
+            os << "OPERATION";
             break;
         }
     }
@@ -401,7 +401,7 @@ void Syntaxer::analyzeOperation(){
             
             ++place;
         }
-    currentEnd = opMain;
+        currentEnd = opMain;
     }
     ++place;
 
@@ -612,6 +612,5 @@ void Syntaxer::analyzeFor(){
     }
     currentEnd = currentBase;
     ++place;
-    std::cout << place << '\n';
     analyzeOperation();
 }
