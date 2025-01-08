@@ -62,28 +62,33 @@ std::ostream& operator<< (std::ostream& os, const Node &node){
     return os;
 }
 
-Node::Node(NodeTypes nodeType, int tokenValue, Node* firstChildNode, Node* secondChildNode, Node* thirdChildNode){
+
+void printNodesInTree(Node *node, int dot){
+    std::cout << (*node) << '\t' << dot << '\n';
+    switch(node->getNumChildren()){
+        case 3:{
+            printNodesInTree(node->getThirdChild(), dot + 1);
+        }
+        case 2:{
+            printNodesInTree(node->getSecondChild(), dot + 1);
+        }
+        case 1:{
+            printNodesInTree(node->getFirstChild(), dot + 1);
+        }
+        case 0:{
+            break;
+        }
+    }
+}
+
+Node::Node(NodeTypes nodeType, int tokenValue){
     type = nodeType;
     value = tokenValue;
 
-    if(firstChild == nullptr){
-        numChildren = 0;
-    }
-    else if(secondChild == nullptr){
-        firstChild = firstChildNode;
-        numChildren = 1;
-    }
-    else if(thirdChild == nullptr){
-        firstChild = firstChildNode;
-        secondChild = secondChildNode;
-        numChildren = 2;
-    }
-    else{
-        firstChild = firstChildNode;
-        secondChild = secondChildNode;
-        thirdChild = thirdChildNode;
-        numChildren = 3;
-    }
+    numChildren = 0;
+    firstChild = nullptr;
+    secondChild = nullptr;
+    thirdChild = nullptr;
 }
 
 Node::~Node(){
@@ -91,17 +96,20 @@ Node::~Node(){
         delete firstChild;
         firstChild = nullptr;
     }
-    if(firstChild != nullptr){
+    if(secondChild != nullptr){
         delete secondChild;
         secondChild = nullptr;
     }
-    if(firstChild != nullptr){
+    if(thirdChild != nullptr){
         delete thirdChild;
         thirdChild = nullptr;
     }
 }
 
 void Node::addChild(Node* childNode){
+    if(childNode == nullptr){
+        return;
+    }
     if(numChildren == 0){
         firstChild = childNode;
     }
@@ -171,11 +179,6 @@ void Syntaxer::analyze(){
             break;
         }
         analyzeOperation();
-    }
-
-
-    for(auto i: *vars){
-        std::cout << i.first << ' ' << i.second << '\n';
     }
 }
 
@@ -324,7 +327,6 @@ void Syntaxer::analyzeOperation(){
                 buffer->type = NodeTypes::CONST;
                 buffer->value = std::stoi((*tokensVec)[place].value);
                 if(operationUsage){
-                    std::cout << operation << '\n';
                     operation->addChild(buffer);
                     buffer = nullptr;
                     bufferUsage = false;
@@ -341,10 +343,9 @@ void Syntaxer::analyzeOperation(){
         else if((*tokensVec)[place].type == TokenTypes::NOT){
         }
         ++place;
-        delete buffer;
-        delete operation;
     }
     ++place;
+
 }
 
 void Syntaxer::analyzePars(){
@@ -360,14 +361,11 @@ void Syntaxer::analyzeBras(){
 }
 
 void Syntaxer::analyzeFor(){
-    std::cout << "start for\n";
-
     Node* forNode = new Node;
     forNode->type = NodeTypes::FOR;
 
-    Node* initial = nullptr;
-    Node* condition = nullptr;
-    Node* change = nullptr;
+    currentBase = forNode;
+    currentEnd = forNode;
 
     ++place;
     if((*tokensVec)[place].type != TokenTypes::LPAR){
@@ -380,60 +378,34 @@ void Syntaxer::analyzeFor(){
     bool bufferUsage = false;
     bool operationUsage = false;
     while((*tokensVec)[place].type != TokenTypes::RPAR){
-        std::cout << "while iteration\n";
         if((*tokensVec)[place].type == TokenTypes::SEMICOL){
-            std::cout << ";\n";
-            if(!init){
-                initial = operation;
-                operation = nullptr;
-                operationUsage = false;
-            }
-            else if(!cond){
-                condition = operation;
-                operation = nullptr;
-                operationUsage = false;
-            }
             if(bufferUsage){
+                std::cout << "add buffer to end\n";
                 currentEnd->addChild(buffer);
+                buffer = nullptr;
+                bufferUsage = false;
             }
+            currentEnd = forNode;
         }
         else if((*tokensVec)[place].type == TokenTypes::VAR){
             if(!bufferUsage){
                 buffer = new Node;
                 buffer->type = NodeTypes::VAR;
                 bufferUsage = true;
-                if(operationUsage){
-                    operation->addChild(buffer);
-                    buffer = nullptr;
-                    bufferUsage = false;
-                }
+            }
+            else{
+                std::cout << "error in using buffers for var\n";
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::INT){
-            if(!operationUsage){
-                // throwError("unused constant");
-                if(init && !cond){
-                    if(std::stoi((*tokensVec)[place].value) == 0){
-                        // 0 iterations
-                    }
-                    else{
-                        // infinity iterations
-                    }
-                }
+            if(!bufferUsage){
+                buffer = new Node;
+                buffer->type = NodeTypes::CONST;
+                buffer->value = std::stoi((*tokensVec)[place].value);
+                bufferUsage = true;
             }
             else{
-                if(!bufferUsage){
-                    buffer = new Node;
-                    buffer->type = NodeTypes::CONST;
-                    buffer->value = std::stoi((*tokensVec)[place].value);
-                    if(operationUsage){
-                        std::cout << operation << '\n';
-                        operation->addChild(buffer);
-                        buffer = nullptr;
-                        bufferUsage = false;
-                        operationUsage = false;
-                    }
-                }
+                std::cout << "error in using buffers for int\n";
             }
         }
         else if((*tokensVec)[place].type == TokenTypes::ASSIG){
@@ -442,15 +414,11 @@ void Syntaxer::analyzeFor(){
             }
             operation = new Node;
             operation->type = NodeTypes::SET;
-            operationUsage = true;
             operation->addChild(buffer);
-            if(currentEnd == nullptr){
-                currentEnd = operation;
-            }
-            else{
-                currentEnd->addChild(operation);
-            }
+            currentEnd->addChild(operation);
+            currentEnd = operation;
             bufferUsage = false;
+            operation = nullptr;
             buffer = nullptr;
         }
         else if((*tokensVec)[place].type == TokenTypes::PLUS){
@@ -460,17 +428,13 @@ void Syntaxer::analyzeFor(){
             }
             operation = new Node;
             operation->type = NodeTypes::ADD;
-            operationUsage = true;
             operation->addChild(buffer);
-            if(currentEnd == nullptr){
-                currentEnd = operation;
-            }
-            else{
-                currentEnd->addChild(operation);
-            }
+            currentEnd->addChild(operation);
+            currentEnd = operation;
             
             bufferUsage = false;
             buffer = nullptr;
+            operation = nullptr;
         }
         else if((*tokensVec)[place].type == TokenTypes::MIN){
             if(!bufferUsage){
@@ -479,17 +443,13 @@ void Syntaxer::analyzeFor(){
             }
             operation = new Node;
             operation->type = NodeTypes::SUB;
-            operationUsage = true;
             operation->addChild(buffer);
-            if(currentEnd == nullptr){
-                currentEnd = operation;
-            }
-            else{
-                currentEnd->addChild(operation);
-            }
+            currentEnd->addChild(operation);
+            currentEnd = operation;
             
             bufferUsage = false;
             buffer = nullptr;
+            operation = nullptr;
         }
         else if((*tokensVec)[place].type == TokenTypes::MUL){
             if(!bufferUsage){
@@ -498,17 +458,13 @@ void Syntaxer::analyzeFor(){
             }
             operation = new Node;
             operation->type = NodeTypes::MUL;
-            operationUsage = true;
             operation->addChild(buffer);
-            if(currentEnd == nullptr){
-                currentEnd = operation;
-            }
-            else{
-                currentEnd->addChild(operation);
-            }
+            currentEnd->addChild(operation);
+            currentEnd = operation;
             
             bufferUsage = false;
             buffer = nullptr;
+            operation = nullptr;
         }
         else if((*tokensVec)[place].type == TokenTypes::DIV){
             if(!bufferUsage){
@@ -517,17 +473,13 @@ void Syntaxer::analyzeFor(){
             }
             operation = new Node;
             operation->type = NodeTypes::DIV;
-            operationUsage = true;
             operation->addChild(buffer);
-            if(currentEnd == nullptr){
-                currentEnd = operation;
-            }
-            else{
-                currentEnd->addChild(operation);
-            }
+            currentEnd->addChild(operation);
+            currentEnd = operation;
             
             bufferUsage = false;
             buffer = nullptr;
+            operation = nullptr;
         }
         else if((*tokensVec)[place].type == TokenTypes::MORE){
             if(!bufferUsage){
@@ -536,17 +488,13 @@ void Syntaxer::analyzeFor(){
             }
             operation = new Node;
             operation->type = NodeTypes::MORE;
-            operationUsage = true;
             operation->addChild(buffer);
-            if(currentEnd == nullptr){
-                currentEnd = operation;
-            }
-            else{
-                currentEnd->addChild(operation);
-            }
+            currentEnd->addChild(operation);
+            currentEnd = operation;
             
             bufferUsage = false;
             buffer = nullptr;
+            operation = nullptr;
         }
         else if((*tokensVec)[place].type == TokenTypes::LESS){
             if(!bufferUsage){
@@ -555,17 +503,13 @@ void Syntaxer::analyzeFor(){
             }
             operation = new Node;
             operation->type = NodeTypes::LESS;
-            operationUsage = true;
             operation->addChild(buffer);
-            if(currentEnd == nullptr){
-                currentEnd = operation;
-            }
-            else{
-                currentEnd->addChild(operation);
-            }
+            currentEnd->addChild(operation);
+            currentEnd = operation;
             
             bufferUsage = false;
             buffer = nullptr;
+            operation = nullptr;
         }
         else if((*tokensVec)[place].type == TokenTypes::EQ){
             if(!bufferUsage){
@@ -574,17 +518,13 @@ void Syntaxer::analyzeFor(){
             }
             operation = new Node;
             operation->type = NodeTypes::EQ;
-            operationUsage = true;
             operation->addChild(buffer);
-            if(currentEnd == nullptr){
-                currentEnd = operation;
-            }
-            else{
-                currentEnd->addChild(operation);
-            }
+            currentEnd->addChild(operation);
+            currentEnd = operation;
             
             bufferUsage = false;
             buffer = nullptr;
+            operation = nullptr;
         }
         else if((*tokensVec)[place].type == TokenTypes::NEQ){
             if(!bufferUsage){
@@ -593,57 +533,28 @@ void Syntaxer::analyzeFor(){
             }
             operation = new Node;
             operation->type = NodeTypes::NEQ;
-            operationUsage = true;
             operation->addChild(buffer);
-            if(currentEnd == nullptr){
-                currentEnd = operation;
-            }
-            else{
-                currentEnd->addChild(operation);
-            }
+            currentEnd->addChild(operation);
+            currentEnd = operation;
             
             bufferUsage = false;
             buffer = nullptr;
-        }
-        else if((*tokensVec)[place].type == TokenTypes::ASSIG){
-            if(!bufferUsage){
-                // throwError("");
-                exit(1);
-            }
-            operation = new Node;
-            operation->type = NodeTypes::SET;
-            operationUsage = true;
-            operation->addChild(buffer);
-            if(currentEnd == nullptr){
-                currentEnd = operation;
-            }
-            else{
-                currentEnd->addChild(operation);
-            }
-            
-            bufferUsage = false;
-            buffer = nullptr;
-        }        
+            operation = nullptr;
+        }     
         ++place;
     }
 
-    change = operation;
-    operation = nullptr;
-    operationUsage = false;
-    std::cout << "1 child for for\n";
-    forNode->addChild(initial);
-    std::cout << "2 child for for\n";
-    forNode->addChild(condition);
-    std::cout << "3 child for for\n";
-    forNode->addChild(change);
-    std::cout << "all childs for for\n";
-
-    initial = nullptr;
-    condition = nullptr;
-    change = nullptr;
-
-    // currentBase->addChild(forNode);
     forNode = nullptr;
+    if(bufferUsage){
+        currentEnd->addChild(buffer);
+        buffer = nullptr;
+        bufferUsage = false;
+    }
 
-    std::cout << "end of for\n";
+    if(currentBase != nullptr){
+        printNodesInTree(currentBase, 0);
+        currentEnd = nullptr;
+        // delete currentBase;
+        currentBase = nullptr;
+    }
 }

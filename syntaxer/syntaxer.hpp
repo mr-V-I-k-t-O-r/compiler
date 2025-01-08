@@ -26,7 +26,7 @@ public:
     NodeTypes type;
 
     // friend std::ostream& operator << (std::ostream& os, const Node &node);
-    Node(NodeTypes type = NodeTypes::EMPTY, int tokenValue = 0, Node* firstChild = nullptr, Node* secondChild = nullptr, Node* thirdChild = nullptr);
+    Node(NodeTypes type = NodeTypes::EMPTY, int tokenValue = 0);
     ~Node();
 
     void addChild(Node* childNode);
