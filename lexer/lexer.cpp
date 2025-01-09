@@ -29,14 +29,6 @@ void Lexer::analyze(){
 			token.type = TokenTypes::RPAR;
 			std::cout << token.value << "\tRPAR\n";
 		}
-		else if (i == "{"){
-			token.type = TokenTypes::LBRA;
-			std::cout << token.value << "\tLBRA\n";
-		}
-		else if (i == "}"){
-			token.type = TokenTypes::RBRA;
-			std::cout << token.value << "\tRBRA\n";
-		}
 		else if (i == ";"){
 			token.type = TokenTypes::SEMICOL;
 			std::cout << token.value << "\tSEMICOL\n";
@@ -90,6 +82,15 @@ void Lexer::analyze(){
 			type = true;
 			std::cout << token.value << "\tTYPE\n";
 		}
+		else if (i == "do"){
+			token.type = TokenTypes::DO;
+			std::cout << token.value << "\tDO\n";
+		}
+		else if (i == "done"){
+			token.type = TokenTypes::DONE;
+			std::cout << token.value << "\tDONE\n";
+		}
+
 		//check is_digit
 		else{
 			if(type){

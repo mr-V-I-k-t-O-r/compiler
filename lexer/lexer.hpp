@@ -9,7 +9,7 @@
 #include <map>
 
 enum class TokenTypes{
-    TYPE, VAR, INT, EQ, NEQ, ASSIG, LBRA, RBRA, LPAR, RPAR, FOR, SEMICOL, MORE, LESS, NOT, PLUS, MIN, MUL, DIV, END
+    TYPE, VAR, INT, EQ, NEQ, ASSIG,LPAR, RPAR, FOR, SEMICOL, MORE, LESS, NOT, PLUS, MIN, MUL, DIV, END, DO, DONE
 };
 
 class Token{

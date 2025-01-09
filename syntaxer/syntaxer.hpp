@@ -8,7 +8,7 @@
 #include "lexer.hpp"
 
 enum class NodeTypes{
-    CONST, VAR, ADD, SUB, MUL, DIV, MORE, LESS, EQ, NEQ, NOT, FOR, SET, EMPTY, START, OPERATION, BLOCK, BLOCKS, BLOCKF
+    CONST, VAR, ADD, SUB, MUL, DIV, MORE, LESS, EQ, NEQ, NOT, FOR, SET, EMPTY, START, OPERATION, BLOCK, BLOCKS, BLOCKF, DO
 };
 
 
@@ -17,7 +17,6 @@ private:
     Node* firstChild;
     Node* secondChild;
     Node* thirdChild;
-    Node* fourthChild;
 
     Node* next;
 
@@ -66,7 +65,7 @@ public:
     void analyze();
     void analyzeOperation();
     void analyzePars();
-    void analyzeBras();
+    void analyzeDo();
     void analyzeFor();
 };
 

@@ -224,9 +224,9 @@ void Syntaxer::analyzeOperation(){
         ++place;
         analyzePars();
     }
-    else if((*tokensVec)[place].type == TokenTypes::LBRA){
+    else if((*tokensVec)[place].type == TokenTypes::DO){
         ++place;
-        analyzeBras();
+        analyzeDo();
     } 
     else if((*tokensVec)[place].type == TokenTypes::FOR){
         analyzeFor();
@@ -398,7 +398,7 @@ void Syntaxer::analyzePars(){
     }
 }
 
-void Syntaxer::analyzeBras(){
+void Syntaxer::analyzeDo(){
     Node *block = new Node(NodeTypes::BLOCK);
     currentEnd->addNext(block);
     currentBase = block;
@@ -408,7 +408,7 @@ void Syntaxer::analyzeBras(){
     currentEnd->addChild(blockStart);
     currentEnd = blockStart;
     blockStart = nullptr;
-    while((*tokensVec)[place].type != TokenTypes::RBRA){
+    while((*tokensVec)[place].type != TokenTypes::DONE){
         analyzeOperation();
     }
 
