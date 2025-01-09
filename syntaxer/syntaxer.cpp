@@ -66,12 +66,12 @@ std::ostream& operator<< (std::ostream& os, const Node &node){
             os << "BLOCK";
             break;
         }
-        case NodeTypes::BLOCKS:{
-            os << "BLOCKS";
+        case NodeTypes::DO:{
+            os << "DO";
             break;
         }
-        case NodeTypes::BLOCKF:{
-            os << "BLOCKF";
+        case NodeTypes::DONE:{
+            os << "DONE";
             break;
         }
         case NodeTypes::OPERATION:{
@@ -404,7 +404,7 @@ void Syntaxer::analyzeDo(){
     currentBase = block;
     currentEnd = currentBase;
     block = nullptr;
-    Node *blockStart = new Node(NodeTypes::BLOCKS);
+    Node *blockStart = new Node(NodeTypes::DO);
     currentEnd->addChild(blockStart);
     currentEnd = blockStart;
     blockStart = nullptr;
@@ -412,7 +412,7 @@ void Syntaxer::analyzeDo(){
         analyzeOperation();
     }
 
-    Node *blockFinish = new Node(NodeTypes::BLOCKF);
+    Node *blockFinish = new Node(NodeTypes::DONE);
     currentEnd->addNext(blockFinish);
     blockFinish = nullptr;
 }
